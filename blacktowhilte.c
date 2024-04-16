@@ -113,13 +113,11 @@ int main()
         printf("9. Rotate Image.\n");
         printf("10. Negative Image.\n");
         printf("11. Exit.\n");
-        // Add more filter options here...
 
         scanf("%d", &choice);
 
-        switch (choice)
-        {
-        case 1:                                    // Black to White
+        if (choice == 1)
+        {                                          // Black to White
                                                    // Implement your code here
             FILE *fIn = fopen("lena512.bmp", "r"); // Input File name
             FILE *fOut = fopen("b_2w.bmp", "w+");  // Output File name
@@ -171,8 +169,10 @@ int main()
             fclose(fOut);
 
             break;
+        }
 
-        case 2: // RGB to Gray
+        else if (choice == 2)
+        { // RGB to Gray
             // Implement your code here
             clock_t start, stop;
 
@@ -229,8 +229,10 @@ int main()
             printf("\nCLOCKS_PER_SEC = %ld\n", stop - start);
             printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
+        }
 
-        case 3: // Increase brightness
+        else if (choice == 3)
+        { // Increase brightness
             // Implement your code here
             FILE *fIn = fopen("lena512.bmp", "r");       // Input File name
             FILE *fOut = fopen("lena_bright.bmp", "w+"); // Output File name
@@ -284,8 +286,10 @@ int main()
             fclose(fOut);
 
             break;
+        }
 
-        case 4: // Blur the Image
+        else if (choice == 4)
+        { // Blur the Image
             // Implement your code here
             clock_t start, stop;
 
@@ -371,8 +375,10 @@ int main()
             printf("\nCLOCKS_PER_SEC = %ld\n", stop - start); // 1000000
             printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
+        }
 
-        case 5: // Blur to Gray
+        else if (choice == 5)
+        { // Blur to Gray
             // Implement your code here
             clock_t start, stop;
 
@@ -441,8 +447,10 @@ int main()
             fclose(fIn);
             fclose(fOut);
             break;
+        }
 
-        case 6: // Colours to Sepia
+        else if (choice == 6)
+        { // Colours to Sepia
             // Implement your code here
             clock_t start, stop;
 
@@ -516,8 +524,10 @@ int main()
             printf("\nCLOCKS_PER_SEC = %ld\n", stop - start);
             printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
+        }
 
-        case 7: // Copy Image
+        else if (choice == 7)
+        { // Copy Image
             // Implement your code here
             clock_t start, stop;
 
@@ -572,8 +582,10 @@ int main()
 
             printf("Time: %lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
+        }
 
-        case 8: // Darken Image
+        else if (choice == 8)
+        { // Darken Image
             // Implement your code here
             FILE *fIn = fopen("lena512.bmp", "r");     // Input File name
             FILE *fOut = fopen("lena_dark.bmp", "w+"); // Output File name
@@ -624,12 +636,16 @@ int main()
             fclose(fIn);
             fclose(fOut);
             break;
+        }
 
-        case 9:
+        else if (choice == 9)
+        {
             rotate(); // Rotate Image
             break;
+        }
 
-        case 10: // Negative Image
+        else if (choice == 10)
+        { // Negative Image
             clock_t start, stop;
             start = clock();
             FILE *fp = fopen("bb.bmp", "rb"); // read the file//
@@ -683,8 +699,10 @@ int main()
             printf("%lf\n", d);
             // Implement your code here
             break;
+        }
 
-        default:
+        else
+        {
             printf("Invalid choice.\n");
             break;
         }
