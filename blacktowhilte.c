@@ -2,52 +2,145 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+
 #define THRESHOLD 128
 #define WHITE 255
 #define BLACK 0
 #define MAX_COLOR 255
 #define BRIGHTNESS_FACTOR 25
-#define THRESHOLD 40
 #define MAX_VALUE 255
+void rotate()
+{
+    FILE *fIn = fopen("lena512.bmp", "r");       // Input File name
+    FILE *fOut = fopen("lena_rotate.bmp", "w+"); // Output File name
 
+    int i, j, choice;
+    unsigned char byte[54], colorTable[1024];
 
+    if (fIn == NULL) // check if the input file has not been opened succesfully.
+    {
+        printf("File does not exist.\n");
+    }
+
+    for (i = 0; i < 54; i++) // read the 54 byte header from fIn
+    {
+        byte[i] = getc(fIn);
+    }
+
+    fwrite(byte, sizeof(unsigned char), 54, fOut); // write the header back
+
+    // extract image height, width and bitDepth from imageHeader
+    int height = *(int *)&byte[18];
+    int width = *(int *)&byte[22];
+    int bitDepth = *(int *)&byte[28];
+
+    printf("width: %d\n", width);
+    printf("height: %d\n", height);
+
+    int size = height * width; // calculate image size
+
+    if (bitDepth <= 8) // if ColorTable present, extract it.
+    {
+        fread(colorTable, sizeof(unsigned char), 1024, fIn);
+        fwrite(colorTable, sizeof(unsigned char), 1024, fOut);
+    }
+
+    unsigned char buffer[width][height]; // to store the image data
+    unsigned char out_buffer[width][height];
+
+    fread(buffer, sizeof(unsigned char), size, fIn); // read the image data
+
+    printf("Enter your choice :\n");
+    printf("1. Rotate right\n");
+    printf("2. Rotate left\n");
+    printf("3. Rotate 180\n");
+
+    scanf("%d", &choice);
+
+    switch (choice) // to rotate image in 3 direction
+    {
+    case 1:
+        for (i = 0; i < width; i++) // to rotate right
+        {
+            for (j = 0; j < height; j++)
+            {
+                out_buffer[j][height - 1 - i] = buffer[i][j];
+            }
+        }
+        break;
+    case 2:
+        for (i = 0; i < width; i++) // to rotate left
+        {
+            for (j = 0; j < height; j++)
+            {
+                out_buffer[j][i] = buffer[i][j];
+            }
+        }
+        break;
+    case 3:
+        for (i = 0; i < width; i++) // to rotate 180 degree
+        {
+            for (j = 0; j < height; j++)
+            {
+                out_buffer[width - i][j] = buffer[i][j];
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    fwrite(out_buffer, sizeof(unsigned char), size, fOut); // write back to the output image
+
+    fclose(fIn);
+    fclose(fOut);
+}
 int main()
 {
-    int choice, i, j, k;
+    int choice, i, j, k, size;
 
-    // Loop to continuously ask for user's choice until 6 is entered
     do
     {
         printf("Select the filter for Image.\n");
-        printf("1.Black to White.\n");
-        printf("2.RGB to gray\n");
+        printf("1. Black to White.\n");
+        printf("2. RGB to gray.\n");
+        printf("3. Increase brightness.\n");
+        printf("4. Blur the Image.\n");
+        printf("5. Blur to Gray.\n");
+        printf("6. Colours to Sepia.\n");
+        printf("7. Copy Image.\n");
+        printf("8. Darken Image.\n");
+        printf("9. Rotate Image.\n");
+        printf("10. Negative Image.\n");
+        printf("11. Exit.\n");
+        // Add more filter options here...
+
         scanf("%d", &choice);
 
         switch (choice)
         {
-        //******************************BLACK TO WHITE*****************************************
-        case 1:
-            FILE *fIn = fopen("lena512.bmp", "r"); // Open input file
-            FILE *fOut = fopen("b_w.bmp", "w+");   // Open output file
+        case 1:                                    // Black to White
+                                                   // Implement your code here
+            FILE *fIn = fopen("lena512.bmp", "r"); // Input File name
+            FILE *fOut = fopen("b_2w.bmp", "w+");  // Output File name
 
+            int i;
             unsigned char byte[54];         // to get the image header
-            unsigned char colorTable[1024]; // to get the color table
+            unsigned char colorTable[1024]; // to get the colortable
 
-            if (fIn == NULL) // Check if the input file has not been opened successfully
+            if (fIn == NULL) // check if the input file has not been opened succesfully.
             {
                 printf("File does not exist.\n");
             }
 
-            // Read the 54 byte header from fIn
-            for (i = 0; i < 54; i++)
+            for (i = 0; i < 54; i++) // read the 54 byte header from fIn
             {
                 byte[i] = getc(fIn);
             }
 
-            // Write the header to fOut
-            fwrite(byte, sizeof(unsigned char), 54, fOut);
+            fwrite(byte, sizeof(unsigned char), 54, fOut); // write the header back
 
-            // Extract image height, width, and bitDepth from imageHeader
+            // extract image height, width and bitDepth from imageHeader
             int height = *(int *)&byte[18];
             int width = *(int *)&byte[22];
             int bitDepth = *(int *)&byte[28];
@@ -55,98 +148,90 @@ int main()
             printf("width: %d\n", width);
             printf("height: %d\n", height);
 
-            int size = height * width; // Calculate image size
+            int size = height * width; // calculate image size
 
-            // If ColorTable is present, extract it
-            if (bitDepth <= 8)
+            if (bitDepth <= 8) // if ColorTable present, extract it.
             {
                 fread(colorTable, sizeof(unsigned char), 1024, fIn);
                 fwrite(colorTable, sizeof(unsigned char), 1024, fOut);
             }
 
-            unsigned char buffer[size]; // To store the image data
+            unsigned char buffer[size]; // to store the image data
 
-            // Read image data
-            fread(buffer, sizeof(unsigned char), size, fIn);
+            fread(buffer, sizeof(unsigned char), size, fIn); // read image data
 
-            // Convert black to white and write back to the output image
-            for (i = 0; i < size; i++)
+            for (i = 0; i < size; i++) // store 0(black) and 255(white) values to buffer
             {
                 buffer[i] = (buffer[i] > THRESHOLD) ? WHITE : BLACK;
             }
 
-            fwrite(buffer, sizeof(unsigned char), size, fOut);
+            fwrite(buffer, sizeof(unsigned char), size, fOut); // write back to the output image
 
-            // Close files
             fclose(fIn);
             fclose(fOut);
+
             break;
 
-        //************************************ RGB TO GRAY ************************************************
-        case 2:
-            FILE *fIN = fopen("lena_color.bmp", "r"); // Input File name
-            FILE *fOUT = fopen("lena_gray.bmp", "w"); // Output File name
+        case 2: // RGB to Gray
+            // Implement your code here
+            clock_t start, stop;
 
+            start = clock(); // Note the start time for profiling purposes.
+
+            FILE *fIn = fopen("lena_color.bmp", "r");  // Input File name
+            FILE *fOut = fopen("lena_gray.bmp", "w+"); // Output File name
+
+            int i, j, y;
             unsigned char byte[54];
 
-            if (fIN == NULL)
+            if (fIn == NULL) // check if the input file has not been opened succesfully.
             {
                 printf("File does not exist.\n");
             }
 
-            // Read the 54 byte header from fIn
-            for (i = 0; i < 54; i++)
+            for (i = 0; i < 54; i++) // read the 54 byte header from fIn
             {
-                byte[i] = getc(fIN);
+                byte[i] = getc(fIn);
             }
 
-            // Write the header to fOut
-            fwrite(byte, sizeof(unsigned char), 54, fOUT);
+            fwrite(byte, sizeof(unsigned char), 54, fOut); // write the header back
 
-            // Extract image height, width, and bitDepth from imageHeader
-            height = *(int *)&byte[18];
-            width = *(int *)&byte[22];
-            bitDepth = *(int *)&byte[28];
+            // extract image height, width and bitDepth from imageHeader
+            int height = *(int *)&byte[18];
+            int width = *(int *)&byte[22];
+            int bitDepth = *(int *)&byte[28];
 
             printf("width: %d\n", width);
             printf("height: %d\n", height);
 
-            size = height * width; // Calculate image size
+            int size = height * width; // calculate image size
 
-            // 2D buffer to store RGB values
-            unsigned char buffer[size][3];
+            unsigned char buffe[size][3]; // to store the image data
 
-            // Convert RGB to grayscale
-            for (i = 0; i < size; i++)
+            for (i = 0; i < size; i++) // RGB to gray
             {
-                int y = 0;
-                buffer[i][2] = getc(fIN); // Blue
-                buffer[i][1] = getc(fIN); // Green
-                buffer[i][0] = getc(fIN); // Red
+                y = 0;
+                buffe[i][2] = getc(fIn); // blue
+                buffe[i][1] = getc(fIn); // green
+                buffe[i][0] = getc(fIn); // red
 
-                // Conversion formula for RGB to grayscale
-                y = (buffer[i][0] * 0.3) + (buffer[i][1] * 0.59) + (buffer[i][2] * 0.11);
+                y = (buffe[i][0] * 0.3) + (buffe[i][1] * 0.59) + (buffe[i][2] * 0.11); // conversion formula of rgb to gray
 
-                putc(y, fOUT); // Write grayscale value to output
-                putc(y, fOUT);
-                putc(y, fOUT);
+                putc(y, fOut);
+                putc(y, fOut);
+                putc(y, fOut);
             }
 
-            // Close files
-            fclose(fOUT);
-            fclose(fIN);
+            fclose(fOut);
+            fclose(fIn);
 
-            // Measure and print execution time
-            // Note: The variables 'start' and 'stop' are not declared or initialized in your code.
-            // Include <time.h> and properly declare and initialize these variables to measure time.
-            // stop = clock();
-            // printf("\nCLOCKS_PER_SEC = %ld\n", stop-start);
-            // printf("%lf ms\n",((double)(stop-start) * 1000.0)/CLOCKS_PER_SEC );
+            stop = clock();
+            printf("\nCLOCKS_PER_SEC = %ld\n", stop - start);
+            printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
 
-            //**********************Increase the brightness********************************
-        case 3:
-
+        case 3: // Increase brightness
+            // Implement your code here
             FILE *fIn = fopen("lena512.bmp", "r");       // Input File name
             FILE *fOut = fopen("lena_bright.bmp", "w+"); // Output File name
 
@@ -197,9 +282,11 @@ int main()
 
             fclose(fIn);
             fclose(fOut);
+
             break;
-            //************************************Blur the Image*************************************
-        case 4:
+
+        case 4: // Blur the Image
+            // Implement your code here
             clock_t start, stop;
 
             start = clock(); // Note the start time for profiling purposes.
@@ -232,14 +319,14 @@ int main()
 
             int size = height * width; // calculate the image size
 
-            unsigned char buffer[size][3]; // store the input image data
-            unsigned char out[size][3];    // store the output image data
+            unsigned char buffe[size][3]; // store the input image data
+            unsigned char out[size][3];   // store the output image data
 
             for (i = 0; i < size; i++) // read image data character by character
             {
-                buffer[i][2] = getc(fIn); // blue
-                buffer[i][1] = getc(fIn); // green
-                buffer[i][0] = getc(fIn); // red
+                buffe[i][2] = getc(fIn); // blue
+                buffe[i][1] = getc(fIn); // green
+                buffe[i][0] = getc(fIn); // red
             }
 
             float v = 1.0 / 9.0; // initialize the blurrring kernel
@@ -259,9 +346,9 @@ int main()
                         for (j = -1; j <= 1; ++j)
                         {
                             // matrix multiplication with kernel with every color plane
-                            sum0 = sum0 + (float)kernel[i + 1][j + 1] * buffer[(x + i) * width + (y + j)][0];
-                            sum1 = sum1 + (float)kernel[i + 1][j + 1] * buffer[(x + i) * width + (y + j)][1];
-                            sum2 = sum2 + (float)kernel[i + 1][j + 1] * buffer[(x + i) * width + (y + j)][2];
+                            sum0 = sum0 + (float)kernel[i + 1][j + 1] * buffe[(x + i) * width + (y + j)][0];
+                            sum1 = sum1 + (float)kernel[i + 1][j + 1] * buffe[(x + i) * width + (y + j)][1];
+                            sum2 = sum2 + (float)kernel[i + 1][j + 1] * buffe[(x + i) * width + (y + j)][2];
                         }
                     }
                     out[(x)*width + (y)][0] = sum0;
@@ -285,8 +372,8 @@ int main()
             printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
 
-        //*****************************************Blur to gray***************************************
-        case 5:
+        case 5: // Blur to Gray
+            // Implement your code here
             clock_t start, stop;
 
             start = clock(); // Note the start time for profiling purposes.
@@ -319,7 +406,7 @@ int main()
 
             int size = height * width; // calculate image size
 
-            unsigned char buffer[size], out[size]; // to store the image data
+            unsigned char buffer[size], outline[size]; // to store the image data
 
             float v = 1.0 / 9.0;
             float kernel[3][3] = {{v, v, v}, // initialize the blurrring kernel
@@ -330,7 +417,7 @@ int main()
 
             for (i = 0; i < size; i++)
             {
-                out[i] = buffer[i]; // copy image data to out bufer
+                outline[i] = buffer[i]; // copy image data to out bufer
             }
 
             for (int x = 1; x < height - 1; x++)
@@ -345,92 +432,93 @@ int main()
                             sum = sum + (float)kernel[i + 1][j + 1] * buffer[(x + i) * width + (y + j)]; // matrix multiplication with kernel
                         }
                     }
-                    out[(x)*width + (y)] = sum;
+                    outline[(x)*width + (y)] = sum;
                 }
             }
 
-            fwrite(out, sizeof(unsigned char), size, fOut); // write image data back to the file
+            fwrite(outline, sizeof(unsigned char), size, fOut); // write image data back to the file
 
             fclose(fIn);
             fclose(fOut);
             break;
 
-        //********************************Coloures to sepia color*******************************
-        case 6:
+        case 6: // Colours to Sepia
+            // Implement your code here
             clock_t start, stop;
 
-	start = clock(); // Note the start time for profiling purposes.
+            start = clock(); // Note the start time for profiling purposes.
 
-	FILE *fIn = fopen("lena_color.bmp", "r");	// Input File name
-	FILE *fOut = fopen("lena_sepia.bmp", "w+"); // Output File name
+            FILE *fIn = fopen("lena_color.bmp", "r");   // Input File name
+            FILE *fOut = fopen("lena_sepia.bmp", "w+"); // Output File name
 
-	int i, r, g, b;
-	unsigned char byte[54];
+            int i, r, g, b;
+            unsigned char byte[54];
 
-	if (fIn == NULL) // check if the input file has not been opened succesfully.
-	{
-		printf("File does not exist.\n");
-	}
+            if (fIn == NULL) // check if the input file has not been opened succesfully.
+            {
+                printf("File does not exist.\n");
+            }
 
-	for (i = 0; i < 54; i++) // read the 54 byte header from fIn
-	{
-		byte[i] = getc(fIn);
-	}
+            for (i = 0; i < 54; i++) // read the 54 byte header from fIn
+            {
+                byte[i] = getc(fIn);
+            }
 
-	fwrite(byte, sizeof(unsigned char), 54, fOut); // write the header back
+            fwrite(byte, sizeof(unsigned char), 54, fOut); // write the header back
 
-	// extract image height, width and bitDepth from imageHeader
-	int height = *(int *)&byte[18];
-	int width = *(int *)&byte[22];
-	int bitDepth = *(int *)&byte[28];
+            // extract image height, width and bitDepth from imageHeader
+            int height = *(int *)&byte[18];
+            int width = *(int *)&byte[22];
+            int bitDepth = *(int *)&byte[28];
 
-	printf("width: %d\n", width);
-	printf("height: %d\n", height);
+            printf("width: %d\n", width);
+            printf("height: %d\n", height);
 
-	int size = height * width; // calculate image size
+            int size = height * width; // calculate image size
 
-	unsigned char buffer[size][3]; // to store the image data
+            unsigned char buffe[size][3]; // to store the image data
 
-	for (i = 0; i < size; i++)
-	{
-		r = 0;
-		g = 0;
-		b = 0;
-		buffer[i][2] = getc(fIn); // blue
-		buffer[i][1] = getc(fIn); // green
-		buffer[i][0] = getc(fIn); // red
+            for (i = 0; i < size; i++)
+            {
+                r = 0;
+                g = 0;
+                b = 0;
+                buffe[i][2] = getc(fIn); // blue
+                buffe[i][1] = getc(fIn); // green
+                buffe[i][0] = getc(fIn); // red
 
-		// conversion formula of rgb to sepia
-		r = (buffer[i][0] * 0.393) + (buffer[i][1] * 0.769) + (buffer[i][2] * 0.189);
-		g = (buffer[i][0] * 0.349) + (buffer[i][1] * 0.686) + (buffer[i][2] * 0.168);
-		b = (buffer[i][0] * 0.272) + (buffer[i][1] * 0.534) + (buffer[i][2] * 0.131);
+                // conversion formula of rgb to sepia
+                r = (buffe[i][0] * 0.393) + (buffe[i][1] * 0.769) + (buffe[i][2] * 0.189);
+                g = (buffe[i][0] * 0.349) + (buffe[i][1] * 0.686) + (buffe[i][2] * 0.168);
+                b = (buffe[i][0] * 0.272) + (buffe[i][1] * 0.534) + (buffe[i][2] * 0.131);
 
-		if (r > MAX_VALUE)
-		{ // if value exceeds
-			r = MAX_VALUE;
-		}
-		if (g > MAX_VALUE)
-		{
-			g = MAX_VALUE;
-		}
-		if (b > MAX_VALUE)
-		{
-			b = MAX_VALUE;
-		}
-		putc(b, fOut);
-		putc(g, fOut);
-		putc(r, fOut);
-	}
+                if (r > MAX_VALUE)
+                { // if value exceeds
+                    r = MAX_VALUE;
+                }
+                if (g > MAX_VALUE)
+                {
+                    g = MAX_VALUE;
+                }
+                if (b > MAX_VALUE)
+                {
+                    b = MAX_VALUE;
+                }
+                putc(b, fOut);
+                putc(g, fOut);
+                putc(r, fOut);
+            }
 
-	fclose(fOut);
-	fclose(fIn);
+            fclose(fOut);
+            fclose(fIn);
 
-	stop = clock();
-	printf("\nCLOCKS_PER_SEC = %ld\n", stop - start);
-	printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
+            stop = clock();
+            printf("\nCLOCKS_PER_SEC = %ld\n", stop - start);
+            printf("%lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
             break;
-        //**********************Copy Image***************************************
-        case 7:
+
+        case 7: // Copy Image
+            // Implement your code here
             clock_t start, stop;
 
             start = clock(); // Note the start time for profiling purposes.
@@ -483,9 +571,10 @@ int main()
             stop = clock();
 
             printf("Time: %lf ms\n", ((double)(stop - start) * 1000.0) / CLOCKS_PER_SEC);
+            break;
 
-        //********************
-        case 8:
+        case 8: // Darken Image
+            // Implement your code here
             FILE *fIn = fopen("lena512.bmp", "r");     // Input File name
             FILE *fOut = fopen("lena_dark.bmp", "w+"); // Output File name
 
@@ -535,92 +624,12 @@ int main()
             fclose(fIn);
             fclose(fOut);
             break;
+
         case 9:
-            FILE *fIn = fopen("lena512.bmp", "r");       // Input File name
-            FILE *fOut = fopen("lena_rotate.bmp", "w+"); // Output File name
-
-            int i, j, choice;
-            unsigned char byte[54], colorTable[1024];
-
-            if (fIn == NULL) // check if the input file has not been opened succesfully.
-            {
-                printf("File does not exist.\n");
-            }
-
-            for (i = 0; i < 54; i++) // read the 54 byte header from fIn
-            {
-                byte[i] = getc(fIn);
-            }
-
-            fwrite(byte, sizeof(unsigned char), 54, fOut); // write the header back
-
-            // extract image height, width and bitDepth from imageHeader
-            int height = *(int *)&byte[18];
-            int width = *(int *)&byte[22];
-            int bitDepth = *(int *)&byte[28];
-
-            printf("width: %d\n", width);
-            printf("height: %d\n", height);
-
-            int size = height * width; // calculate image size
-
-            if (bitDepth <= 8) // if ColorTable present, extract it.
-            {
-                fread(colorTable, sizeof(unsigned char), 1024, fIn);
-                fwrite(colorTable, sizeof(unsigned char), 1024, fOut);
-            }
-
-            unsigned char buffer[width][height]; // to store the image data
-            unsigned char out_buffer[width][height];
-
-            fread(buffer, sizeof(unsigned char), size, fIn); // read the image data
-
-            printf("Enter your choice :\n");
-            printf("1. Rotate right\n");
-            printf("2. Rotate left\n");
-            printf("3. Rotate 180\n");
-
-            scanf("%d", &choice);
-
-            switch (choice) // to rotate image in 3 direction
-            {
-            case 1:
-                for (i = 0; i < width; i++) // to rotate right
-                {
-                    for (j = 0; j < height; j++)
-                    {
-                        out_buffer[j][height - 1 - i] = buffer[i][j];
-                    }
-                }
-                break;
-            case 2:
-                for (i = 0; i < width; i++) // to rotate left
-                {
-                    for (int j = 0; j < height; j++)
-                    {
-                        out_buffer[j][i] = buffer[i][j];
-                    }
-                }
-                break;
-            case 3:
-                for (i = 0; i < width; i++) // to rotate 180 degree
-                {
-                    for (j = 0; j < height; j++)
-                    {
-                        out_buffer[width - i][j] = buffer[i][j];
-                    }
-                }
-                break;
-            default:
-                break;
-            }
-
-            fwrite(out_buffer, sizeof(unsigned char), size, fOut); // write back to the output image
-
-            fclose(fIn);
-            fclose(fOut);
+            rotate(); // Rotate Image
             break;
-        case 10:
+
+        case 10: // Negative Image
             clock_t start, stop;
             start = clock();
             FILE *fp = fopen("bb.bmp", "rb"); // read the file//
@@ -672,12 +681,14 @@ int main()
             stop = clock();
             double d = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
             printf("%lf\n", d);
-            default:
+            // Implement your code here
+            break;
+
+        default:
             printf("Invalid choice.\n");
             break;
         }
-        
-    } while (choice != 10); // Exit loop when choice is 10
+    } while (choice != 10);
 
     return 0;
 }
