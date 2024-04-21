@@ -26,7 +26,7 @@ This project aims to apply various image filters and transformations to BMP imag
 
 1. **Compile the Code**
     ```bash
-    gcc MAjor_Project.c -o image_processing
+    gcc Major_Project.c -o image_processing
     ```
 
 2. **Run the Program**
