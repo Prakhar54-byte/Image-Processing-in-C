@@ -27,7 +27,7 @@ This project provides an image processing application implemented in C. The appl
 
 1. **Compile the Code**
     ```bash
-    gcc main.c filter.c -o image_processing
+    gcc b23cm1026_b23ee1005_b23bb1032_b23ci1036main.c b23cm1026_b23ee1005_b23bb1032_b23ci1036filter.c -o image_processing
     ```
 
 2. **Run the Program**
